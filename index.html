@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لعبستان — أرض الألعاب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="games.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Cairo:wght@400;600;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07051a;
+  --bg2:#120a33;
+  --pink:#ff2bd6;
+  --cyan:#22f2ff;
+  --yellow:#ffe14d;
+  --lime:#7dff6b;
+  --purple:#8b5cff;
+  --text:#f4f0ff;
+  --muted:#a9a2cf;
+  --card:#150f3a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100%;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit}
+
+/* ===== الخلفية ===== */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.grid-floor{
+  position:fixed;left:-50%;right:-50%;bottom:-10vh;height:55vh;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(transparent 0 96%, rgba(255,43,214,.55) 96% 100%) 0 0/100% 60px,
+    linear-gradient(90deg, transparent 0 97%, rgba(34,242,255,.45) 97% 100%) 0 0/60px 100%;
+  transform:perspective(320px) rotateX(62deg);
+  transform-origin:bottom;
+  animation:floor 2.2s linear infinite;
+  mask-image:linear-gradient(to top, #000 10%, transparent 90%);
+  -webkit-mask-image:linear-gradient(to top, #000 10%, transparent 90%);
+  opacity:.55;
+}
+@keyframes floor{to{background-position:0 60px,0 0}}
+.glow-blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.35;z-index:0;pointer-events:none}
+.b1{width:420px;height:420px;background:var(--pink);top:-120px;right:-100px;animation:drift 12s ease-in-out infinite alternate}
+.b2{width:380px;height:380px;background:var(--cyan);top:40%;left:-140px;animation:drift 15s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(60px,80px) scale(1.15)}}
+
+main{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 20px 120px}
+
+/* ===== الهيرو والشعار ===== */
+.hero{text-align:center;padding:64px 0 30px}
+.logo{display:inline-flex;align-items:center;gap:18px;position:relative}
+.logo-icon{
+  width:84px;height:84px;border-radius:22px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--pink),var(--purple) 55%,var(--cyan));
+  box-shadow:0 0 30px rgba(255,43,214,.7),0 0 70px rgba(34,242,255,.35),inset 0 -6px 0 rgba(0,0,0,.25);
+  animation:bob 2.6s ease-in-out infinite;transform:rotate(-8deg);
+}
+.logo-icon svg{width:56px;height:56px}
+@keyframes bob{50%{transform:rotate(6deg) translateY(-8px)}}
+.logo-text{
+  font-family:'Lalezar',cursive;font-size:clamp(64px,13vw,132px);line-height:1;letter-spacing:1px;
+  background:linear-gradient(180deg,#fff 0%,#ffe9fb 30%,var(--pink) 62%,var(--purple) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 14px rgba(255,43,214,.75)) drop-shadow(0 6px 0 #3a0f66);
+  position:relative;
+}
+.logo-text .dot{color:var(--yellow);-webkit-text-fill-color:var(--yellow);filter:drop-shadow(0 0 10px var(--yellow))}
+.logo-sub{
+  font-family:'Press Start 2P',monospace;font-size:clamp(9px,1.6vw,13px);letter-spacing:6px;
+  color:var(--cyan);text-shadow:0 0 10px var(--cyan);margin-top:12px;direction:ltr;
+}
+.tagline{margin:22px auto 0;max-width:560px;font-size:clamp(16px,2.4vw,20px);color:var(--muted);font-weight:600}
+.press-start{
+  display:inline-block;margin-top:26px;font-family:'Press Start 2P',monospace;font-size:13px;color:var(--yellow);
+  text-shadow:0 0 12px var(--yellow);animation:blink 1.1s steps(2) infinite;direction:ltr;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ===== شريط الإحصاء والأدوات ===== */
+.hud{
+  margin:34px auto 28px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  background:rgba(21,15,58,.65);border:2px solid rgba(139,92,255,.45);border-radius:20px;padding:12px 14px;
+  backdrop-filter:blur(8px);box-shadow:0 0 30px rgba(139,92,255,.2);
+}
+.stat{display:flex;align-items:center;gap:10px;font-weight:800}
+.stat .num{
+  font-family:'Press Start 2P',monospace;font-size:20px;color:var(--lime);text-shadow:0 0 10px var(--lime);
+  min-width:44px;text-align:center;direction:ltr;
+}
+.search{
+  flex:1;min-width:180px;max-width:360px;display:flex;align-items:center;gap:8px;
+  background:#0c0828;border:2px solid #2c2170;border-radius:14px;padding:8px 12px;
+}
+.search input{background:none;border:0;outline:0;color:var(--text);font:inherit;width:100%}
+.search:focus-within{border-color:var(--cyan);box-shadow:0 0 14px rgba(34,242,255,.4)}
+.btn{
+  border:0;border-radius:14px;padding:11px 18px;font-weight:800;font-size:15px;color:#0b0620;
+  display:inline-flex;align-items:center;gap:8px;transition:transform .15s, box-shadow .15s;
+}
+.btn:active{transform:translateY(2px)}
+.btn-random{background:var(--yellow);box-shadow:0 5px 0 #b48f00,0 0 18px rgba(255,225,77,.45)}
+.btn-random:hover{transform:translateY(-2px) rotate(-2deg)}
+.btn-add{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;box-shadow:0 5px 0 #6b1660,0 0 22px rgba(255,43,214,.55)}
+.btn-add:hover{transform:translateY(-2px)}
+.btn-ghost{background:#231a5a;color:var(--text);box-shadow:0 4px 0 #120c35}
+
+/* ===== شبكة الألعاب ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:26px}
+.card{
+  position:relative;border-radius:22px;background:var(--card);overflow:hidden;
+  border:2px solid rgba(255,255,255,.08);
+  transform-style:preserve-3d;transition:transform .2s ease, box-shadow .25s, border-color .25s;
+  animation:pop .55s cubic-bezier(.2,1.6,.4,1) both;
+}
+@keyframes pop{from{opacity:0;transform:translateY(30px) scale(.85)}}
+.card:hover{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(34,242,255,.25),0 18px 50px rgba(255,43,214,.35),0 0 40px rgba(34,242,255,.25)}
+.cover{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0d0930}
+.cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.card:hover .cover img{transform:scale(1.08)}
+.cover .fallback{
+  position:absolute;inset:0;display:grid;place-items:center;font-size:72px;
+}
+.cover .fallback span{filter:drop-shadow(0 6px 0 rgba(0,0,0,.3));animation:bob 3s ease-in-out infinite}
+.cover::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.35) 45%,transparent 60%);
+  transform:translateX(120%);transition:transform .7s;
+}
+.card:hover .cover::after{transform:translateX(-120%)}
+.badge{
+  position:absolute;top:12px;right:12px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:800;
+  background:rgba(7,5,26,.75);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(4px);
+}
+.new-badge{
+  position:absolute;top:12px;left:12px;font-family:'Press Start 2P',monospace;font-size:9px;padding:6px 8px;border-radius:8px;
+  background:var(--lime);color:#062b00;box-shadow:0 0 14px var(--lime);animation:wiggle 1.4s ease-in-out infinite;direction:ltr;
+}
+@keyframes wiggle{50%{transform:rotate(-8deg) scale(1.08)}}
+.body{padding:16px 18px 18px}
+.title{font-family:'Lalezar',cursive;font-size:28px;line-height:1.15;margin-bottom:4px}
+.desc{color:var(--muted);font-size:14px;min-height:22px;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.play{
+  display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;width:100%;
+  background:linear-gradient(90deg,var(--cyan),var(--lime));color:#05122a;border-radius:14px;padding:12px;
+  font-family:'Lalezar',cursive;font-size:22px;letter-spacing:.5px;
+  box-shadow:0 5px 0 #0a7d77,0 0 20px rgba(34,242,255,.4);transition:transform .15s, box-shadow .15s;
+}
+.play:hover{transform:translateY(-2px);box-shadow:0 7px 0 #0a7d77,0 0 30px rgba(125,255,107,.6)}
+.play:active{transform:translateY(3px);box-shadow:0 2px 0 #0a7d77}
+.play .tri{width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:14px solid #05122a}
+.owner-tools{display:flex;gap:8px;margin-top:10px}
+.owner-tools button{flex:1;border:1px solid #3a2d8a;background:#1b1450;color:var(--text);border-radius:10px;padding:7px;font-size:13px;font-weight:700}
+.owner-tools button:hover{border-color:var(--cyan)}
+.owner-tools .del:hover{border-color:#ff4d6d;color:#ff8fa3}
+.card.hidden-game{opacity:.5;filter:grayscale(.7)}
+.card.hidden-game .play{pointer-events:none;background:#3a3460;color:#9a93c7;box-shadow:none}
+
+/* ===== حالة فارغة / تحميل ===== */
+.empty{text-align:center;padding:60px 20px;border:2px dashed #3a2d8a;border-radius:24px;background:rgba(21,15,58,.45)}
+.empty .big{font-size:70px;animation:bob 2.4s ease-in-out infinite;display:inline-block}
+.empty h3{font-family:'Lalezar',cursive;font-size:32px;margin:10px 0 6px}
+.empty p{color:var(--muted)}
+.loader{display:flex;gap:10px;justify-content:center;padding:70px 0}
+.loader i{width:16px;height:16px;background:var(--pink);animation:jump .8s ease-in-out infinite;box-shadow:0 0 12px var(--pink)}
+.loader i:nth-child(2){background:var(--cyan);animation-delay:.12s;box-shadow:0 0 12px var(--cyan)}
+.loader i:nth-child(3){background:var(--yellow);animation-delay:.24s;box-shadow:0 0 12px var(--yellow)}
+@keyframes jump{50%{transform:translateY(-22px)}}
+.note{text-align:center;color:var(--muted);font-size:14px;margin:10px 0}
+
+/* ===== النافذة ===== */
+.modal-bg{position:fixed;inset:0;background:rgba(4,2,16,.78);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal-bg.open{display:flex}
+.modal{
+  width:100%;max-width:480px;max-height:92vh;overflow:auto;background:linear-gradient(160deg,#1a1248,#0f0a30);
+  border:2px solid var(--purple);border-radius:24px;padding:24px;box-shadow:0 0 60px rgba(139,92,255,.45);
+  animation:pop .4s cubic-bezier(.2,1.6,.4,1);
+}
+.modal h2{font-family:'Lalezar',cursive;font-size:32px;margin-bottom:14px;color:var(--yellow);text-shadow:0 0 12px rgba(255,225,77,.5)}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:800;font-size:14px;margin-bottom:6px}
+.field label small{color:var(--muted);font-weight:600}
+.field input,.field textarea,.field select{
+  width:100%;background:#0b0726;border:2px solid #2c2170;border-radius:12px;color:var(--text);font:inherit;padding:10px 12px;outline:0;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--cyan)}
+.field input[dir=ltr]{text-align:left}
+.emoji-row{display:flex;flex-wrap:wrap;gap:6px}
+.emoji-row button{width:40px;height:40px;border-radius:10px;border:2px solid #2c2170;background:#0b0726;font-size:20px}
+.emoji-row button.on{border-color:var(--yellow);box-shadow:0 0 10px rgba(255,225,77,.6)}
+.drop{
+  border:2px dashed #4b3caa;border-radius:14px;padding:14px;text-align:center;cursor:pointer;color:var(--muted);position:relative;overflow:hidden;
+}
+.drop:hover{border-color:var(--cyan);color:var(--text)}
+.drop img{max-width:100%;max-height:160px;border-radius:10px;display:block;margin:0 auto 8px}
+.drop input{display:none}
+.modal-actions{display:flex;gap:10px;margin-top:8px}
+.modal-actions .btn{flex:1;justify-content:center}
+.err{color:#ff8fa3;font-weight:700;font-size:14px;min-height:20px;margin-bottom:6px}
+
+/* ===== تأكيد الحذف ===== */
+.confirm p{margin-bottom:16px;color:var(--muted)}
+
+/* ===== توست ===== */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:#1b1450;border:2px solid var(--lime);
+  color:var(--text);padding:12px 20px;border-radius:14px;font-weight:800;z-index:60;transition:transform .35s cubic-bezier(.2,1.6,.4,1);
+  box-shadow:0 0 24px rgba(125,255,107,.4)
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+footer{text-align:center;color:var(--muted);padding:40px 0 0;font-size:13px}
+footer .px{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--pink);direction:ltr;display:inline-block;margin-top:6px}
+
+@media (max-width:600px){
+  .hud{justify-content:center}
+  .search{max-width:none;order:3;flex-basis:100%}
+  .logo-icon{width:62px;height:62px;border-radius:16px}
+  .logo-icon svg{width:40px;height:40px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="glow-blob b1"></div>
+<div class="glow-blob b2"></div>
+<div class="grid-floor"></div>
+
+<main>
+  <header class="hero">
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <path d="M14 22h36a10 10 0 0 1 10 10l-2 12a7 7 0 0 1-12 3l-5-6H23l-5 6a7 7 0 0 1-12-3L4 32a10 10 0 0 1 10-10z" fill="#fff"/>
+          <rect x="14" y="29" width="4" height="12" rx="1.5" fill="#8b5cff"/>
+          <rect x="10" y="33" width="12" height="4" rx="1.5" fill="#8b5cff"/>
+          <circle cx="46" cy="30" r="3" fill="#ff2bd6"/>
+          <circle cx="52" cy="36" r="3" fill="#22f2ff"/>
+          <circle cx="40" cy="36" r="3" fill="#ffe14d"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">لعبستان<span class="dot">!</span></div>
+      </div>
+    </div>
+    <div class="logo-sub">LA3BISTAN · LAND OF GAMES</div>
+    <p class="tagline">أرضٌ كل زاوية فيها لعبة… اختر مغامرتك واضغط العب 🎮</p>
+    <div class="press-start">▶ PRESS START</div>
+  </header>
+
+  <section class="hud">
+    <div class="stat"><span class="num" id="count">0</span><span>لعبة جاهزة للعب</span></div>
+    <label class="search">🔍<input id="q" type="search" placeholder="دوّر على لعبة..."></label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-random" id="randomBtn">🎲 فاجئني!</button>
+    </div>
+  </section>
+
+  <div class="note" id="note" hidden></div>
+  <section id="games"><div class="loader"><i></i><i></i><i></i></div></section>
+
+  <footer>
+    صُنع بحب في لعبستان 💜<br><span class="px">GAME OVER? NEVER.</span>
+  </footer>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========== خلفية النجوم والبكسلات ========== */
+(function(){
+  const c = document.getElementById('stars'), x = c.getContext('2d');
+  const colors = ['#ff2bd6','#22f2ff','#ffe14d','#7dff6b','#ffffff'];
+  let w, h, ps = [];
+  function size(){ w = c.width = innerWidth; h = c.height = innerHeight;
+    ps = Array.from({length: Math.min(90, Math.floor(w/14))}, () => ({
+      x: Math.random()*w, y: Math.random()*h, s: Math.random()*3+1,
+      v: Math.random()*0.4+0.1, c: colors[Math.floor(Math.random()*colors.length)], t: Math.random()*6 }));
+  }
+  size(); addEventListener('resize', size);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  (function loop(){
+    x.clearRect(0,0,w,h);
+    for (const p of ps){
+      p.y -= p.v; p.t += 0.05; if (p.y < -5){ p.y = h+5; p.x = Math.random()*w; }
+      x.globalAlpha = 0.4 + Math.sin(p.t)*0.35; x.fillStyle = p.c; x.fillRect(p.x, p.y, p.s, p.s);
+    }
+    requestAnimationFrame(loop);
+  })();
+})();
+
+/* ========== أصوات صغيرة ========== */
+let actx;
+function beep(type){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const notes = type==='play' ? [523,659,784,1047] : type==='random' ? [392,523,392,659] : [660];
+    notes.forEach((f,i)=>{
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'square'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.06, actx.currentTime + i*0.07);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + i*0.07 + 0.12);
+      o.connect(g); g.connect(actx.destination);
+      o.start(actx.currentTime + i*0.07); o.stop(actx.currentTime + i*0.07 + 0.13);
+    });
+  }catch(e){}
+}
+
+/* ========== الحالة ========== */
+const EMOJIS = ['🎮','💣','🧪','🕵️','🃏','🚀','👾','🧩','🔥','⚡','🏆','🐉','🧠','🎯'];
+const GRADS = [
+  ['#ff2bd6','#8b5cff'],['#22f2ff','#3b5bff'],['#ffe14d','#ff6b2b'],['#7dff6b','#0fb5a8'],
+  ['#ff4d6d','#8b1fff'],['#ff9a3c','#ff2bd6'],['#3cf0c4','#7a4dff']
+];
+let games = [], query = '';
+const canEdit = false;
+const $ = id => document.getElementById(id);
+
+function hash(s){ let h=0; for (const ch of s) h = (h*31 + ch.charCodeAt(0))|0; return Math.abs(h); }
+function cleanUrl(u){
+  u = (u||'').trim(); if (!u) return '';
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try { const p = new URL(u); return (p.protocol==='http:'||p.protocol==='https:') ? p.href : ''; } catch(e){ return null; }
+}
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* ========== الرسم ========== */
+function visibleGames(){
+  return games.filter(g => canEdit || g.url)
+    .filter(g => !query || (g.title||'').includes(query) || (g.desc||'').includes(query) || (g.cat||'').includes(query));
+}
+function render(){
+  const live = games.filter(g => g.url);
+  animateCount(live.length);
+  const list = visibleGames();
+  const box = $('games'); box.innerHTML = '';
+  if (!list.length){
+    const e = document.createElement('div'); e.className = 'empty';
+    e.innerHTML = '<div class="big">🕹️</div><h3></h3><p></p>';
+    e.querySelector('h3').textContent = query ? 'ما لقينا لعبة بهالاسم' : 'الساحة فاضية… للحين!';
+    e.querySelector('p').textContent = query ? 'جرّب كلمة ثانية' : (canEdit ? 'اضغط «أضف لعبة» وحط رابط أول لعبة لك 🚀' : 'الألعاب جاية قريب، ترقّبوا 👀');
+    box.appendChild(e); return;
+  }
+  const grid = document.createElement('div'); grid.className = 'grid';
+  const now = Date.now();
+  list.forEach((g, i) => {
+    const card = document.createElement('article');
+    card.className = 'card' + (g.url ? '' : ' hidden-game');
+    card.style.animationDelay = (i*0.06) + 's';
+
+    const cover = document.createElement('div'); cover.className = 'cover';
+    const [c1,c2] = GRADS[hash(g.title||'x') % GRADS.length];
+    if (g.image){
+      const img = document.createElement('img'); img.loading='lazy'; img.alt = g.title||'';
+      img.src = g.image;
+      img.onerror = () => { img.remove(); cover.prepend(fallback()); };
+      cover.appendChild(img);
+    } else cover.appendChild(fallback());
+    function fallback(){
+      const f = document.createElement('div'); f.className='fallback';
+      f.style.background = `radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), transparent 40%), linear-gradient(135deg, ${c1}, ${c2})`;
+      const s = document.createElement('span'); s.textContent = g.emoji || '🎮'; f.appendChild(s); return f;
+    }
+    const badge = document.createElement('span'); badge.className='badge'; badge.textContent = g.cat || 'لعبة';
+    cover.appendChild(badge);
+    if (g.isNew){
+      const nb = document.createElement('span'); nb.className='new-badge'; nb.textContent='NEW!'; cover.appendChild(nb);
+    }
+
+    const body = document.createElement('div'); body.className='body';
+    const t = document.createElement('h3'); t.className='title'; t.textContent = g.title || 'بدون اسم';
+    const d = document.createElement('p'); d.className='desc'; d.textContent = g.desc || (g.url ? 'جاهز للتحدي؟' : 'مخفية — ما لها رابط (الزوار ما يشوفونها)');
+    const a = document.createElement('a'); a.className='play';
+    a.innerHTML = '<span class="tri"></span><span>العب الآن</span>';
+    if (g.url){ a.href = g.url; a.target = '_blank'; a.rel = 'noopener'; a.addEventListener('click', () => beep('play')); }
+    body.append(t, d, a);
+
+    if (canEdit){
+      const tools = document.createElement('div'); tools.className='owner-tools';
+      const eb = document.createElement('button'); eb.textContent='✏️ تعديل'; eb.onclick = () => openForm(g);
+      const db_ = document.createElement('button'); db_.className='del'; db_.textContent='🗑️ حذف'; db_.onclick = () => askDelete(g);
+      tools.append(eb, db_); body.appendChild(tools);
+    }
+    card.append(cover, body);
+
+    // ميلان ثلاثي الأبعاد مع الماوس
+    card.addEventListener('pointermove', e => {
+      const r = card.getBoundingClientRect(), px = (e.clientX-r.left)/r.width - .5, py = (e.clientY-r.top)/r.height - .5;
+      card.style.transform = `perspective(700px) rotateY(${px*10}deg) rotateX(${-py*10}deg) translateY(-6px)`;
+    });
+    card.addEventListener('pointerleave', () => card.style.transform = '');
+    grid.appendChild(card);
+  });
+  box.appendChild(grid);
+}
+let shown = 0;
+function animateCount(n){
+  const el = $('count'); const start = shown, diff = n - start, t0 = performance.now();
+  (function step(t){ const k = Math.min(1,(t-t0)/600); el.textContent = Math.round(start + diff*k); if (k<1) requestAnimationFrame(step); else shown = n; })(t0);
+}
+
+$('q').addEventListener('input', e => { query = e.target.value.trim(); render(); });
+$('randomBtn').addEventListener('click', () => {
+  const live = games.filter(g => g.url);
+  if (!live.length){ toast('ما فيه ألعاب للحين 😅'); return; }
+  beep('random');
+  const cards = [...document.querySelectorAll('.card:not(.hidden-game)')];
+  const pick = live[Math.floor(Math.random()*live.length)];
+  const target = cards.find(c => c.querySelector('.title').textContent === pick.title);
+  if (target){
+    target.scrollIntoView({behavior:'smooth', block:'center'});
+    target.animate([{transform:'scale(1)'},{transform:'scale(1.08) rotate(-2deg)'},{transform:'scale(1)'}],{duration:600,iterations:2});
+    target.style.borderColor = 'var(--yellow)'; setTimeout(()=>target.style.borderColor='',1500);
+  }
+  toast('🎲 جرّب: ' + pick.title);
+});
+
+/* ========== تشغيل ========== */
+games = (window.GAMES || []).map(g => ({ ...g, url: cleanUrl(g.url) || '' }));
+render();
+</script>
+</body>
+</html>
